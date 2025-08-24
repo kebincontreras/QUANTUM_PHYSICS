@@ -29,7 +29,3 @@ El script se encargará de:
 3. Ejecutar la simulación `A2_3.py`.
 
 Al finalizar, la animación se mostrará en pantalla y se guardará como `simetria_AB4.gif`.
-
-
-![Animación de la molécula AB4](simetria_AB4_final.gif)
-
