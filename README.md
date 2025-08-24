@@ -1,3 +1,4 @@
+![Animación de la molécula AB4](simetria_AB4_final.gif)
 # Simulación AB4 Cómo Ejecutar el Proyecto
 
 Este proyecto visualiza las operaciones de simetría de una molécula teórica AB₄ utilizando Matplotlib en Python. La animación muestra rotaciones y reflexiones con transiciones suaves para una mejor comprensión de los conceptos de simetría.
@@ -29,6 +30,6 @@ El script se encargará de:
 
 Al finalizar, la animación se mostrará en pantalla y se guardará como `simetria_AB4.gif`.
 
-## Vista Previa de la Animación
 
 ![Animación de la molécula AB4](simetria_AB4_final.gif)
+
