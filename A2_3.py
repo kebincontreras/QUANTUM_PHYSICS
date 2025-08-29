@@ -3,13 +3,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.animation as animation
 
-# --- Definiciones Base ---
 def definir_ab4():
     A = np.array([0, 0, 1])
     B = np.array([[1, 1, 0], [-1, 1, 0], [-1, -1, 0], [1, -1, 0]])
     return A, B
 
-# --- Lógica de Visualización ---
 def mostrar_molecula(ax, A, B, title='Geometría de la molécula AB4', plano=None):
     ax.clear()
     ax.set_xlim([-2, 2]); ax.set_ylim([-2, 2]); ax.set_zlim([-1, 3])
@@ -22,14 +20,14 @@ def mostrar_molecula(ax, A, B, title='Geometría de la molécula AB4', plano=Non
         if plano == 'eje_z':
             z_line = np.linspace(-1, 3, 100)
             ax.plot(np.zeros_like(z_line), np.zeros_like(z_line), z_line, color='orange', linewidth=5)
-        elif plano == 'diag1': # Plano para σv1 (B1-B3 fijos)
+        elif plano == 'diag1':
             ax.plot_surface(X, X, Z, alpha=0.3, color='green')
-        elif plano == 'diag2': # Plano para σv2 (B2-B4 fijos)
+        elif plano == 'diag2':
             ax.plot_surface(X, -X, Z, alpha=0.3, color='purple')
-        elif plano == 'yz': # Plano para σd1 (x=0)
+        elif plano == 'yz':
             Y, Z_yz = np.meshgrid(np.linspace(-2, 2, 20), z)
             ax.plot_surface(np.zeros_like(Y), Y, Z_yz, alpha=0.3, color='blue')
-        elif plano == 'xz': # Plano para σd2 (y=0)
+        elif plano == 'xz':
             ax.plot_surface(X, np.zeros_like(X), Z, alpha=0.3, color='red')
 
     ax.plot([-2, 2], [0, 0], [0, 0], 'k--', alpha=0.5, linewidth=1)
@@ -50,22 +48,26 @@ def mostrar_molecula(ax, A, B, title='Geometría de la molécula AB4', plano=Non
         ax.plot([A[0], b[0]], [A[1], b[1]], [A[2], b[2]], color='gray')
     ax.legend(loc='upper left'); ax.set_title(title)
 
-# --- Operaciones de Simetría (Lógica Correcta) ---
 def rotacion_c4(coords):
     theta = np.pi/2
     R = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
     return coords @ R.T
 
-def reflexion_sigmav1(coords): # Deja fijos B1, B3
+def reflexion_sigmav1(coords):
     res = coords.copy(); res[1], res[3] = coords[3], coords[1]; return res
-def reflexion_sigmav2(coords): # Deja fijos B2, B4
+def reflexion_sigmav2(coords):
     res = coords.copy(); res[0], res[2] = coords[2], coords[0]; return res
-def reflexion_sigmad1(coords): # Plano x=0
+def reflexion_sigmad1(coords):
     res = coords.copy(); res[0], res[1] = coords[1], coords[0]; res[2], res[3] = coords[3], coords[2]; return res
-def reflexion_sigmad2(coords): # Plano y=0
+def reflexion_sigmad2(coords):
     res = coords.copy(); res[0], res[3] = coords[3], coords[0]; res[1], res[2] = coords[2], coords[1]; return res
 
-# --- Animación Final Unificada ---
+def reflexion_sigmav_xz(coords):
+    res = coords.copy(); res[0], res[3] = coords[3], coords[0]; res[1], res[2] = coords[2], coords[1]; return res
+
+def reflexion_sigmav_yz(coords):
+    res = coords.copy(); res[0], res[1] = coords[1], coords[0]; res[2], res[3] = coords[3], coords[2]; return res
+
 def animacion_simetria_final():
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
@@ -77,10 +79,10 @@ def animacion_simetria_final():
         ('Rotación C4² (180°)', rotacion_c4, 'eje_z'),
         ('Rotación C4³ (270°)', rotacion_c4, 'eje_z'),
         ('Rotación C4⁴ (360°=E)', rotacion_c4, 'eje_z'),
-        ('Reflexión σv1 (B1,B3 fijos)', reflexion_sigmav1, 'diag1'),
-        ('Reflexión σv2 (B2,B4 fijos)', reflexion_sigmav2, 'diag2'),
-        ('Reflexión σd1 (plano x=0)', reflexion_sigmad1, 'yz'),
-        ('Reflexión σd2 (plano y=0)', reflexion_sigmad2, 'xz')
+        ('Reflexión σv1 (plano xz)', reflexion_sigmav_xz, 'xz'),
+        ('Reflexión σv2 (plano yz)', reflexion_sigmav_yz, 'yz'),
+        ('Reflexión σb1 (B1,B3 fijos)', reflexion_sigmav1, 'diag1'),
+        ('Reflexión σb2 (B2,B4 fijos)', reflexion_sigmav2, 'diag2')
     ]
 
     posiciones_finales = []
@@ -102,7 +104,7 @@ def animacion_simetria_final():
         if op_idx == 0:
             B_inicial = B.copy()
         elif 'Reflexión' in op_name and 'Rotación' in operaciones[op_idx-1][0]:
-            B_inicial = B.copy() # Reset para la primera reflexión
+            B_inicial = B.copy()
         else:
             _, B_inicial, _ = posiciones_finales[op_idx - 1]
 
@@ -118,12 +120,6 @@ def animacion_simetria_final():
 
     ani = animation.FuncAnimation(fig, update, frames=total_frames, interval=50, repeat=True)
     
-    # --- Guardar la animación como GIF ---
-    # (Puede requerir tener 'imagemagick' instalado)
-    #print("Guardando GIF... Esto puede tardar unos momentos.")
-    #ani.save('simetria_AB4.gif', writer='imagemagick', fps=20)
-    #print("GIF guardado como 'simetria_AB4.gif'")
-
     plt.show()
 
 animacion_simetria_final()
